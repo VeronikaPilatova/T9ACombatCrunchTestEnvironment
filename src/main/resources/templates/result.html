@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../static/css/styly.css"
+          th:href="${'css/styly.css'}"/>
+    <link rel="icon" href="../static/images/favicon.png"
+          th:href="${'images/favicon.png'}"/>
+    <title>T9A Combat Crunch Test</title>
+</head>
+<body>
+    <div>
+        <table>
+            <tr>
+                <th colspan="13"><h3>Unit 1</h3></th>
+            </tr>
+            <tr>
+                <th>HP</th>
+                <th>DEF</th>
+                <th>RES</th>
+                <th>ARM</th>
+                <th>Armor type</th>
+                <th>Fortitude</th>
+                <th>Aegis</th>
+                <th>Discipline</th>
+                <th>Base width</th>
+                <th>Base length</th>
+                <th>Model Height</th>
+                <th>Model Type</th>
+                <th>Special rules</th>
+            </tr>
+            <tr>
+                <td th:text="${unit1Entry.hp}">HP</td>
+                <td th:text="${unit1Entry.def}">DEF</td>
+                <td th:text="${unit1Entry.res}">RES</td>
+                <td th:text="${unit1Entry.arm}">ARM</td>
+                <td th:text="${unit1Entry.armorTypeString}">Armor type</td>
+                <td th:text="${unit1Entry.fortitudeSave}">Fortitude</td>
+                <td th:text="${unit1Entry.aegisSave}">Aegis</td>
+                <td th:text="${unit1Entry.leadership}">Discipline</td>
+                <td th:text="${unit1Entry.baseWidth}">Base width</td>
+                <td th:text="${unit1Entry.baseLength}">Base length</td>
+                <td th:text="${unit1Entry.modelHeightString}">Model Height</td>
+                <td th:text="${unit1Entry.modelTypeString}">Model Type</td>
+                <td th:text="${unit1SpecialRules}">Special rules</td>
+            </tr>
+            <tr>
+                <th colspan="13">Offensive profiles</th>
+            </tr>
+            <tr>
+                <th>Attacks</th>
+                <th>OFF</th>
+                <th>STR</th>
+                <th>AP</th>
+                <th>AGI</th>
+                <th>Weapon</th>
+                <th>Multiple<br>wounds</th>
+                <th>Impact<br>hits</th>
+                <th>Stomp</th>
+                <th>Grinding<br>hits</th>
+                <th>Special rules</th>
+                <th>Repeated?</th>
+            </tr>
+            <tr th:each="profile : ${unit1Profiles}">
+                <td th:text="${profile.att}">Attacks</td>
+                <td th:text="${profile.off}">OFF</td>
+                <td th:text="${profile.str}">STR</td>
+                <td th:text="${profile.ap}">AP</td>
+                <td th:text="${profile.agi}">AGI</td>
+                <td th:text="${profile.actualWeaponString}">Weapon</td>
+                <td th:text="${profile.multipleWoundsString}">Multiple<br>wounds</td>
+                <td th:text="${profile.impactHitsString}">Impact<br>hits</td>
+                <td th:text="${profile.stompString}">Stomp</td>
+                <td th:text="${profile.grindingHitsString}">Grinding<br>hits</td>
+                <td th:text="${profile.specialRulesString}">Special rules</td>
+                <td th:text="${profile.countInUnit}">Repeated?</td>
+            </tr>
+            <tr>
+                <th>Model count</th>
+                <th>Models in row</th>
+                <th>Charge</th>
+            </tr>
+            <tr>
+                <td th:text="${unit1.modelCount}">Model count</td>
+                <td th:text="${unit1.rowModels}">Models in row</td>
+                <td th:text="${unit1.chargeString}">Charge</td>
+            </tr>
+            <tr>
+                <th colspan="13"><h3>Unit 2</h3></th>
+            </tr>
+            <tr>
+                <th>HP</th>
+                <th>DEF</th>
+                <th>RES</th>
+                <th>ARM</th>
+                <th>Armor type</th>
+                <th>Fortitude</th>
+                <th>Aegis</th>
+                <th>Discipline</th>
+                <th>Base width</th>
+                <th>Base length</th>
+                <th>Model Height</th>
+                <th>Model Type</th>
+                <th>Special rules</th>
+            </tr>
+            <tr>
+                <td th:text="${unit2Entry.hp}">HP</td>
+                <td th:text="${unit2Entry.def}">DEF</td>
+                <td th:text="${unit2Entry.res}">RES</td>
+                <td th:text="${unit2Entry.arm}">ARM</td>
+                <td th:text="${unit2Entry.armorTypeString}">Armor type</td>
+                <td th:text="${unit2Entry.fortitudeSave}">Fortitude</td>
+                <td th:text="${unit2Entry.aegisSave}">Aegis</td>
+                <td th:text="${unit2Entry.leadership}">Discipline</td>
+                <td th:text="${unit2Entry.baseWidth}">Base width</td>
+                <td th:text="${unit2Entry.baseLength}">Base length</td>
+                <td th:text="${unit2Entry.modelHeightString}">Model Height</td>
+                <td th:text="${unit2Entry.modelTypeString}">Model Type</td>
+                <td th:text="${unit2SpecialRules}">Special rules</td>
+            </tr>
+            <tr>
+                <th colspan="13">Offensive profiles</th>
+            </tr>
+            <tr>
+                <th>Attacks</th>
+                <th>OFF</th>
+                <th>STR</th>
+                <th>AP</th>
+                <th>AGI</th>
+                <th>Weapon</th>
+                <th>Multiple<br>wounds</th>
+                <th>Impact<br>hits</th>
+                <th>Stomp</th>
+                <th>Grinding<br>hits</th>
+                <th>Special rules</th>
+                <th>Repeated?</th>
+            </tr>
+            <tr th:each="profile : ${unit2Profiles}">
+                <td th:text="${profile.att}">Attacks</td>
+                <td th:text="${profile.off}">OFF</td>
+                <td th:text="${profile.str}">STR</td>
+                <td th:text="${profile.ap}">AP</td>
+                <td th:text="${profile.agi}">AGI</td>
+                <td th:text="${profile.actualWeaponString}">Weapon</td>
+                <td th:text="${profile.multipleWoundsString}">Multiple<br>wounds</td>
+                <td th:text="${profile.impactHitsString}">Impact<br>hits</td>
+                <td th:text="${profile.stompString}">Stomp</td>
+                <td th:text="${profile.grindingHitsString}">Grinding<br>hits</td>
+                <td>Special rules</td>
+                <td th:text="${profile.countInUnit}">Repeated?</td>
+            </tr>
+            <tr>
+                <th>Model count</th>
+                <th>Models in row</th>
+                <th>Charge</th>
+            </tr>
+            <tr>
+                <td th:text="${unit2.modelCount}">Model count</td>
+                <td th:text="${unit2.rowModels}">Models in row</td>
+                <td th:text="${unit2.chargeString}">Charge</td>
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        <h2>Test combat result:</h2>
+        <p th:each="line : ${combatDescription}" th:text="${line}">Combat description</p>
+    </div>
+
+</body>
+</html>

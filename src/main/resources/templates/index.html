@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../static/css/styly.css"
+          th:href="${'css/styly.css'}"/>
+    <link rel="icon" href="../static/images/favicon.png"
+          th:href="${'images/favicon.png'}"/>
+    <title>T9A Combat Crunch Test</title>
+</head>
+<body>
+    <div class="page">
+
+        <h1>T9A Combat Crunch Test</h1>
+
+        <form method="post">
+            <h2>Unit1</h2>
+            <h3>Models and modifiers</h3>
+            <table>
+                <tr>
+                    <th>Model count</th>
+                    <th>Models in row</th>
+                    <th>Charge</th>
+                    <th>Champion</th>
+                    <th>Musician</th>
+                    <th>Standard</th>
+                    <th>BSB</th>
+                    <th>General</th>
+                    <th>General Discipline</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="100" name="u1_modelCount" value="10" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="100" name="u1_rowModels" value="5" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="checkbox" name="u1_charge" value="TRUE"/>
+                    </td>
+                    <td><input type="checkbox" name="u1_champion" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u1_musician" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u1_standard" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u1_BSB" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u1_general" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u1_generalDis" value="9" class="editNumber"/>
+                    </td>
+                </tr>
+            </table>
+            <h3>Armybook Entry</h3>
+            <table>
+                <tr>
+                    <th>HP</th>
+                    <th>DEF</th>
+                    <th>RES</th>
+                    <th>ARM</th>
+                    <th>Armor type</th>
+                    <th>Fortitude</th>
+                    <th>Aegis</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="10" name="u1_hp" value="1" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u1_def" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u1_res" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u1_arm" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="u1_armorType">
+                            <option selected="selected" value="None">None</option>
+                            <option value="Light">Light</option>
+                            <option value="Heavy">Heavy</option>
+                            <option value="Plate">Plate</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u1_fortitude" value="0"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u1_aegis" value="0" class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Discipline</th>
+                    <th>Base width</th>
+                    <th>Base length</th>
+                    <th>Model Height</th>
+                    <th>Model Type</th>
+                    <th>Special rules</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="10" name="u1_discipline" value="7"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="20" max="200" step="5" name="u1_baseWidth" value="20"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="20" max="200" step="5" name="u1_baseLength" value="20"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="u1_modelHeight">
+                            <option selected="selected" value="Standard">Standard</option>
+                            <option value="Large">Large</option>
+                            <option value="Gigantic">Gigantic</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="u1_modelType">
+                            <option selected="selected" value="Infantry">Infantry</option>
+                            <option value="Cavalry">Cavalry</option>
+                            <option value="Beast">Beast</option>
+                            <option value="Construct">Construct</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="u1_specialRules">
+                            <option th:each="specialRule : ${specialRulesArmybookEntry}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <h3>Offensive profiles</h3>
+            <table>
+                <tr>
+                    <th>Number</th>
+                    <th>Active?</th>
+                    <th>Attacks</th>
+                    <th>OFF</th>
+                    <th>STR</th>
+                    <th>AP</th>
+                    <th>AGI</th>
+                    <th>Weapon</th>
+                    <th>Multiple<br>wounds</th>
+                    <th>Impact<br>hits</th>
+                    <th>Stomp</th>
+                    <th>Grinding<br>hits</th>
+                    <th>Special rules</th>
+                    <th>Repeated?</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td><input type="checkbox" checked="checked" disabled="disabled" name="op11_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op11_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op11_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op11_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op11_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op11_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op11_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op11_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op11_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op11_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op11_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td><select multiple name="op11_specialRules">
+                        <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                    </select></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op11_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><input type="checkbox" name="op12_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op12_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op12_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op12_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op12_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op12_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op12_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op12_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op12_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op12_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op12_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op12_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op12_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><input type="checkbox" name="op13_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op13_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op13_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op13_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op13_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op13_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op13_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op13_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op13_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op13_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op13_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op13_specialRules">
+                        <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                    </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op13_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><input type="checkbox" name="op14_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op14_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op14_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op14_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op14_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op14_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op14_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op14_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op14_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op14_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op14_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op14_specialRules">
+                        <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                    </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op14_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><input type="checkbox" name="op15_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op15_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op15_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op15_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op15_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op15_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op15_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op15_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op15_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op15_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op15_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op15_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op15_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+            </table>
+
+            <br>
+            <br>
+
+            <h2>Unit2</h2>
+            <h3>Models and modifiers</h3>
+            <table>
+                <tr>
+                    <th>Model count</th>
+                    <th>Models in row</th>
+                    <th>Charge</th>
+                    <th>Champion</th>
+                    <th>Musician</th>
+                    <th>Standard</th>
+                    <th>BSB</th>
+                    <th>General</th>
+                    <th>General Discipline</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="100" name="u2_modelCount" value="10" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="100" name="u2_rowModels" value="5" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="checkbox" name="u2_charge" value="TRUE"/>
+                    </td>
+                    <td><input type="checkbox" name="u2_champion" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u2_musician" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u2_standard" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u2_BSB" value="TRUE"/></td>
+                    <td><input type="checkbox" name="u2_general" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u2_generalDis" value="9" class="editNumber"/>
+                    </td>
+                </tr>
+            </table>
+            <h3>Armybook Entry</h3>
+            <table>
+                <tr>
+                    <th>HP</th>
+                    <th>DEF</th>
+                    <th>RES</th>
+                    <th>ARM</th>
+                    <th>Armor type</th>
+                    <th>Fortitude</th>
+                    <th>Aegis</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="10" name="u2_hp" value="1" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u2_def" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="u2_res" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u2_arm" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="u2_armorType">
+                            <option selected="selected" value="None">None</option>
+                            <option value="Light">Light</option>
+                            <option value="Heavy">Heavy</option>
+                            <option value="Plate">Plate</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u2_fortitude" value="0"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="u2_aegis" value="0" class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Discipline</th>
+                    <th>Base width</th>
+                    <th>Base length</th>
+                    <th>Model Height</th>
+                    <th>Model Type</th>
+                    <th>Special rules</th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="number" min="1" max="10" name="u2_discipline" value="7"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="20" max="200" step="5" name="u2_baseWidth" value="20"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="20" max="200" step="5" name="u2_baseLength" value="20"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="u2_modelHeight">
+                            <option selected="selected" value="Standard">Standard</option>
+                            <option value="Large">Large</option>
+                            <option value="Gigantic">Gigantic</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="u2_modelType">
+                            <option selected="selected" value="Infantry">Infantry</option>
+                            <option value="Cavalry">Cavalry</option>
+                            <option value="Beast">Beast</option>
+                            <option value="Construct">Construct</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="u2_specialRules">
+                            <option th:each="specialRule : ${specialRulesArmybookEntry}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <h3>Offensive profiles</h3>
+            <table>
+                <tr>
+                    <th>Number</th>
+                    <th>Active?</th>
+                    <th>Attacks</th>
+                    <th>OFF</th>
+                    <th>STR</th>
+                    <th>AP</th>
+                    <th>AGI</th>
+                    <th>Weapon</th>
+                    <th>Multiple<br>wounds</th>
+                    <th>Impact<br>hits</th>
+                    <th>Stomp</th>
+                    <th>Grinding<br>hits</th>
+                    <th>Special rules</th>
+                    <th>Repeated?</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td><input type="checkbox" checked="checked" disabled="disabled" name="op21_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op21_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op21_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op21_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op21_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op21_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op21_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select></td>
+                    <td>
+                        <select name="op21_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op21_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op21_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op21_grindingHits">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op21_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op21_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><input type="checkbox" name="op22_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op22_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op22_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op22_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op22_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op22_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op22_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op22_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op22_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op22_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op22_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op22_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op22_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><input type="checkbox" name="op23_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op23_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op23_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op23_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op23_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op23_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op23_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op23_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op23_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op23_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op23_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op23_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op23_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><input type="checkbox" name="op24_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op24_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op24_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op24_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op24_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op24_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op24_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op24_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op24_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op24_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op24_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op24_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op24_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><input type="checkbox" name="op25_active" value="TRUE"/></td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op25_attacks" value="1"
+                               class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op25_off" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op25_str" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="0" max="10" name="op25_ap" value="0" class="editNumber"/>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op25_agi" value="3" class="editNumber"/>
+                    </td>
+                    <td>
+                        <select name="op25_weapon">
+                            <option selected="selected" value="Hand weapon">Hand weapon</option>
+                            <option value="Hand weapon and shield">Hand weapon and shield</option>
+                            <option value="Great weapon">Great weapon</option>
+                            <option value="Halberd">Halberd</option>
+                            <option value="Lance">Lance</option>
+                            <option value="Light lance">Light lance</option>
+                            <option value="Light lance and shield">Light lance and shield</option>
+                            <option value="Paired weapons">Paired weapons</option>
+                            <option value="Spear">Spear</option>
+                            <option value="Spear and shield">Spear and shield</option>
+                            <option value="Uprooted tree">Uprooted tree</option>
+                            <option value="Giant club">Giant club</option>
+                            <option value="None">None</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op25_multipleWounds">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op25_impactHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op25_stomp">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="op25_grindingHits">
+                            <option selected="selected" value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="D3">D3</option>
+                            <option value="D3+1">D3+1</option>
+                            <option value="2D3">2D3</option>
+                            <option value="D6">D6</option>
+                            <option value="D6+1">D6+1</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select multiple name="op25_specialRules">
+                            <option th:each="specialRule : ${specialRulesOffensiveProfile}" th:value="${specialRule}" th:text="${specialRule}">special rule</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" min="1" max="10" name="op25_repeated" value="1"
+                               class="editNumber"/>
+                    </td>
+                </tr>
+            </table>
+
+            <br>
+            <input type="submit" value="Test combat result">
+        </form>
+
+
+    </div>
+</body>
+</html>
