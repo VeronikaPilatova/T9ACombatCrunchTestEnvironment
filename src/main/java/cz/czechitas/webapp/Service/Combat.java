@@ -40,7 +40,7 @@ public class Combat {
         //special rules
         for (Unit unit : units) {
             if (unit.getSpecialRules().contains(SpecialRule.WALL_OF_IRON)) {
-                //TODO
+                unit.setAegisSave(5);
             }
             //discipline modifiers
             if (unit.getGeneralLeadership() > 0) {
@@ -190,6 +190,10 @@ public class Combat {
         if (outcome == null) {
             combatScoreAndBreakTest();
         }
+    }
+
+    public void applyDevastatingCharge(OffensiveProfile profile) {
+        Unit unit = identifyUnit(profile);
     }
 
     public int getUnitWidth(Unit unit) {

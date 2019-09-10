@@ -74,7 +74,7 @@ public class HlavniController {
             op11SpecialRules.add(specialRule);
         }
         OffensiveProfile op11 = new OffensiveProfile("OP1.1", input.getOp11_attacks(), input.getOp11_off(), input.getOp11_str(), input.getOp11_ap(), input.getOp11_agi(),
-                1, input.getOp11_multipleWounds(), input.getOp11_impactHits(), input.getOp11_stomp(), input.getOp11_grindingHits(), op11SpecialRules);
+                1, input.getOp11_multipleWounds(), input.getOp11_impactHits(), input.getOp11_stomp(), input.getOp11_grindingHits(), op11SpecialRules, new DevastatingCharge());
         op11.setCountInUnit(input.getOp11_repeated());
         op11.setActualWeapon(input.getOp11_weapon());
         op11.setSpecialRulesStringList(input.getOp11_specialRules());
@@ -94,7 +94,7 @@ public class HlavniController {
                 op12SpecialRules.add(specialRule);
             }
             OffensiveProfile op12 = new OffensiveProfile("OP1.2", input.getOp12_attacks(), input.getOp12_off(), input.getOp12_str(), input.getOp12_ap(), input.getOp12_agi(),
-                    1, input.getOp12_multipleWounds(), input.getOp12_impactHits(), input.getOp12_stomp(), input.getOp12_grindingHits(), op12SpecialRules);
+                    1, input.getOp12_multipleWounds(), input.getOp12_impactHits(), input.getOp12_stomp(), input.getOp12_grindingHits(), op12SpecialRules, new DevastatingCharge());
             op12.setCountInUnit(input.getOp12_repeated());
             op12.setActualWeapon(input.getOp12_weapon());
             op12.setSpecialRulesStringList(input.getOp12_specialRules());
@@ -115,7 +115,7 @@ public class HlavniController {
                 op13SpecialRules.add(specialRule);
             }
             OffensiveProfile op13 = new OffensiveProfile("OP1.3", input.getOp13_attacks(), input.getOp13_off(), input.getOp13_str(), input.getOp13_ap(), input.getOp13_agi(),
-                    1, input.getOp13_multipleWounds(), input.getOp13_impactHits(), input.getOp13_stomp(), input.getOp13_grindingHits(), op13SpecialRules);
+                    1, input.getOp13_multipleWounds(), input.getOp13_impactHits(), input.getOp13_stomp(), input.getOp13_grindingHits(), op13SpecialRules, new DevastatingCharge());
             op13.setCountInUnit(input.getOp13_repeated());
             op13.setActualWeapon(input.getOp13_weapon());
             op13.setSpecialRulesStringList(input.getOp13_specialRules());
@@ -136,7 +136,7 @@ public class HlavniController {
                 op14SpecialRules.add(specialRule);
             }
             OffensiveProfile op14 = new OffensiveProfile("OP1.4", input.getOp14_attacks(), input.getOp14_off(), input.getOp14_str(), input.getOp14_ap(), input.getOp14_agi(),
-                    1, input.getOp14_multipleWounds(), input.getOp14_impactHits(), input.getOp14_stomp(), input.getOp14_grindingHits(), op14SpecialRules);
+                    1, input.getOp14_multipleWounds(), input.getOp14_impactHits(), input.getOp14_stomp(), input.getOp14_grindingHits(), op14SpecialRules, new DevastatingCharge());
             op14.setCountInUnit(input.getOp14_repeated());
             op14.setActualWeapon(input.getOp14_weapon());
             op14.setSpecialRulesStringList(input.getOp14_specialRules());
@@ -157,7 +157,7 @@ public class HlavniController {
                 op15SpecialRules.add(specialRule);
             }
             OffensiveProfile op15 = new OffensiveProfile("OP1.5", input.getOp15_attacks(), input.getOp15_off(), input.getOp15_str(), input.getOp15_ap(), input.getOp15_agi(),
-                    1, input.getOp15_multipleWounds(), input.getOp15_impactHits(), input.getOp15_stomp(), input.getOp15_grindingHits(), op15SpecialRules);
+                    1, input.getOp15_multipleWounds(), input.getOp15_impactHits(), input.getOp15_stomp(), input.getOp15_grindingHits(), op15SpecialRules, new DevastatingCharge());
             op15.setCountInUnit(input.getOp15_repeated());
             op15.setActualWeapon(input.getOp15_weapon());
             op15.setSpecialRulesStringList(input.getOp15_specialRules());
@@ -186,7 +186,7 @@ public class HlavniController {
             op21SpecialRules.add(specialRule);
         }
         OffensiveProfile op21 = new OffensiveProfile("OP2.1", input.getOp21_attacks(), input.getOp21_off(), input.getOp21_str(), input.getOp21_ap(), input.getOp21_agi(),
-                1, input.getOp21_multipleWounds(), input.getOp21_impactHits(), input.getOp21_stomp(), input.getOp21_grindingHits(), op21SpecialRules);
+                1, input.getOp21_multipleWounds(), input.getOp21_impactHits(), input.getOp21_stomp(), input.getOp21_grindingHits(), op21SpecialRules, new DevastatingCharge());
         op21.setCountInUnit(input.getOp21_repeated());
         op21.setActualWeapon(input.getOp21_weapon());
         op21.setSpecialRulesStringList(input.getOp21_specialRules());
@@ -206,7 +206,7 @@ public class HlavniController {
                 op22SpecialRules.add(specialRule);
             }
             OffensiveProfile op22 = new OffensiveProfile("OP2.2", input.getOp22_attacks(), input.getOp22_off(), input.getOp22_str(), input.getOp22_ap(), input.getOp22_agi(),
-                    1, input.getOp22_multipleWounds(), input.getOp22_impactHits(), input.getOp22_stomp(), input.getOp22_grindingHits(), op22SpecialRules);
+                    1, input.getOp22_multipleWounds(), input.getOp22_impactHits(), input.getOp22_stomp(), input.getOp22_grindingHits(), op22SpecialRules, new DevastatingCharge());
             op22.setCountInUnit(input.getOp22_repeated());
             op22.setActualWeapon(input.getOp22_weapon());
             op22.setSpecialRulesStringList(input.getOp22_specialRules());
@@ -227,7 +227,7 @@ public class HlavniController {
                 op23SpecialRules.add(specialRule);
             }
             OffensiveProfile op23 = new OffensiveProfile("OP2.3", input.getOp23_attacks(), input.getOp23_off(), input.getOp23_str(), input.getOp23_ap(), input.getOp23_agi(),
-                    1, input.getOp23_multipleWounds(), input.getOp23_impactHits(), input.getOp23_stomp(), input.getOp23_grindingHits(), op23SpecialRules);
+                    1, input.getOp23_multipleWounds(), input.getOp23_impactHits(), input.getOp23_stomp(), input.getOp23_grindingHits(), op23SpecialRules, new DevastatingCharge());
             op23.setCountInUnit(input.getOp23_repeated());
             op23.setActualWeapon(input.getOp23_weapon());
             op23.setSpecialRulesStringList(input.getOp23_specialRules());
@@ -248,7 +248,7 @@ public class HlavniController {
                 op24SpecialRules.add(specialRule);
             }
             OffensiveProfile op24 = new OffensiveProfile("OP2.4", input.getOp24_attacks(), input.getOp24_off(), input.getOp24_str(), input.getOp24_ap(), input.getOp24_agi(),
-                    1, input.getOp24_multipleWounds(), input.getOp24_impactHits(), input.getOp24_stomp(), input.getOp24_grindingHits(), op24SpecialRules);
+                    1, input.getOp24_multipleWounds(), input.getOp24_impactHits(), input.getOp24_stomp(), input.getOp24_grindingHits(), op24SpecialRules, new DevastatingCharge());
             op24.setCountInUnit(input.getOp24_repeated());
             op24.setActualWeapon(input.getOp24_weapon());
             op24.setSpecialRulesStringList(input.getOp24_specialRules());
@@ -269,7 +269,7 @@ public class HlavniController {
                 op25SpecialRules.add(specialRule);
             }
             OffensiveProfile op25 = new OffensiveProfile("OP2.5", input.getOp25_attacks(), input.getOp25_off(), input.getOp25_str(), input.getOp25_ap(), input.getOp25_agi(),
-                    1, input.getOp25_multipleWounds(), input.getOp25_impactHits(), input.getOp25_stomp(), input.getOp25_grindingHits(), op25SpecialRules);
+                    1, input.getOp25_multipleWounds(), input.getOp25_impactHits(), input.getOp25_stomp(), input.getOp25_grindingHits(), op25SpecialRules, new DevastatingCharge());
             op25.setCountInUnit(input.getOp25_repeated());
             op25.setActualWeapon(input.getOp25_weapon());
             op25.setSpecialRulesStringList(input.getOp25_specialRules());

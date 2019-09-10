@@ -85,7 +85,8 @@ public class Unit extends ArmybookEntry {
                     offensiveTemplate.getImpactHits(),
                     offensiveTemplate.getStomp(),
                     offensiveTemplate.getGrindingHits(),
-                    offensiveTemplate.getSpecialRules());
+                    offensiveTemplate.getSpecialRules(),
+                    offensiveTemplate.getDevastatingCharge());
             offensiveProfile.setUnitId(unitId);
             int index = offensiveTemplates.indexOf(offensiveTemplate);
             //match and set how many times the offensive profile repeats in the armybook entry
