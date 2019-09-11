@@ -7,11 +7,13 @@ import cz.czechitas.webapp.Service.Units.*;
 import static java.lang.Math.*;
 
 public class Combat {
+
     private Unit unit1;
     private Unit unit2;
     private Unit unit1Original;
     private Unit unit2Original;
     private List<Unit> units;
+    List<OffensiveProfile> allProfiles;
 
     private int round;
     private CombatOutcome outcome;
@@ -33,44 +35,20 @@ public class Combat {
     }
 
     public Outcome fullCombat(int combatPhases) {
+        //preparation
         round = 0;
         outcome = null;
         rolled6 = 0;
+        allProfiles = sortByAgi(); //prepare a list of offensive profiles in the correct order
 
-        //special rules
         for (Unit unit : units) {
-            if (unit.getSpecialRules().contains(SpecialRule.WALL_OF_IRON)) {
-                unit.setAegisSave(5);
-            }
-            //discipline modifiers
+            //apply general leadership
             if (unit.getGeneralLeadership() > 0) {
                 int leadership = max(unit.getGeneralLeadership(), unit.getLeadership());
                 unit.setLeadership(leadership);
             }
-            if (unit.getSpecialRules().contains(SpecialRule.AURA_OF_MADNESS)) {
-                identifyOpposingUnit(unit).setLeadership(unit.getLeadership() - 1);
-            }
-            if (unit.getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEARLESS) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.DRUNK)) {
-                identifyOpposingUnit(unit).setLeadership(unit.getLeadership() - 1);
-            }
-            //offensive special rules
-            for (OffensiveProfile profile : unit.getOffensiveProfiles()) {
-                if (profile.getSpecialRules().contains(SpecialRule.FLAMING_ATTACKS) && identifyOpposingUnit(identifyUnit(profile)).getSpecialRules().contains(SpecialRule.FLAMEABLE)) {
-                    profile.setRerollWound(true);
-                }
-                //weapons
-                if (profile.getActualWeapon() == WeaponType.GREAT && !profile.getSpecialRules().contains(SpecialRule.LIGHTNING_REFLEXES)) {
-                    profile.setAgi(0);
-                }
-                if (profile.getActualWeapon() == WeaponType.GIANT_CLUB) {
-                    profile.setStr(profile.getStr() + 1);
-                    profile.setAp(profile.getAp() + 1);
-                }
-                if (profile.getActualWeapon() == WeaponType.UPROOTED_TREE) {
-                    profile.setStr(5);
-                    profile.setAp(0);
-                }
-            }
+            //apply special rules
+            specialRulesGlobal(unit);
         }
 
         //go through combat phases
@@ -91,7 +69,7 @@ public class Combat {
         return fullOutcome;
     }
 
-    public void combatPhase() {
+    private void combatPhase() {
         //preparation
         round += 1;
         unit1.setWoundsInRound(0);
@@ -100,40 +78,30 @@ public class Combat {
         combatDescription.add("- ROUND " + round + " -");
         combatDescription.add(unit1.getName() + ": " + unit1.getModelCount() + " models, " + unit1.getAllRows() + "x" + unit1.getRowModels()
                 + " fighting " + unit2.getName() + ": " + unit2.getModelCount() + " models, " + unit2.getAllRows() + "x" + unit2.getRowModels());
-        List<OffensiveProfile> allProfiles = sortByAgi(); //prepare a list of offensive profiles in the correct order
-
         //special rules
         for (Unit unit : units) {
-            if (unit.getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEARLESS) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.DRUNK)) {
-                combatDescription.add("Need to roll discipline for " + identifyOpposingUnit(unit).getName() + " (fear)");
-                if (breakTestPassed(identifyOpposingUnit(unit), 0)) {
-                    identifyOpposingUnit(unit).setFailedFear(0);
-                } else {
-                    identifyOpposingUnit(unit).setFailedFear(1);
-                }
-            }
-            if (!(unit.getAegisSave() != 0 && unit.getAegisSave() < 6) && unit.getSpecialRules().contains(SpecialRule.SHIELD_WALL) && unit.usingShield()) {
-                unit.setAegisSave(6);
-                if (identifyOpposingUnit(unit).getCharge() == 1 && round == 1) {
-                    unit.setAegisSave(5);
-                }
-            }
+            specialRulesRound(unit);
         }
-        for (OffensiveProfile profile : allProfiles) {
-            //rules giving reroll for hit for this round: only when no reroll for whole combat
-            if (!profile.isRerollHitBasic()) {
-                profile.setRerollHit(false);
-                if (profile.getSpecialRules().contains(SpecialRule.HATRED) && round == 1) {
-                    profile.setRerollHit(true);
-                }
-                if (profile.getSpecialRules().contains(SpecialRule.PRIMAL_INSTINCT) && !profile.isRerollHit()) {
-                    if (breakTestPassed(identifyUnit(profile), 0)) {
-                        profile.setRerollHit(true);
+        //check for first round and charge, apply devastating charge when needed
+        if (round == 1) {
+            for (Unit unit : units) {
+                if (unit.getCharge() == 1) {
+                    for (OffensiveProfile profile : unit.getOffensiveProfiles()) {
+                        applyDevastatingCharge(profile, 1);
                     }
                 }
             }
         }
-
+        //on second round remove changes made by devastating charge
+        if (round == 2) {
+            for (Unit unit : units) {
+                if (unit.getCharge() == 1) {
+                    for (OffensiveProfile profile : unit.getOffensiveProfiles()) {
+                        applyDevastatingCharge(profile, -1);
+                    }
+                }
+            }
+        }
         //roll the dice
         //impact hits
         if (round == 1) {
@@ -146,12 +114,8 @@ public class Combat {
             }
             //remove killed models unless the first profile to attack is also on initiative step 10
             if (allProfiles.get(0).getAgiCurrent() != 10) {
-                if (unit1.getWoundsOnAgiStep() > 0) {
-                    removeCasualties(unit1);
-                }
-                if (unit2.getWoundsOnAgiStep() > 0) {
-                    removeCasualties(unit2);
-                }
+                if (unit1.getWoundsOnAgiStep() > 0) { removeCasualties(unit1); }
+                if (unit2.getWoundsOnAgiStep() > 0) { removeCasualties(unit2); }
             }
         }
         //standard combat
@@ -180,23 +144,47 @@ public class Combat {
                 }
             }
         }
-        if (unit1.getWoundsOnAgiStep() > 0) {
-            removeCasualties(unit1);
-        }
-        if (unit2.getWoundsOnAgiStep() > 0) {
-            removeCasualties(unit2);
-        }
+        if (unit1.getWoundsOnAgiStep() > 0) { removeCasualties(unit1); }
+        if (unit2.getWoundsOnAgiStep() > 0) { removeCasualties(unit2); }
         //if no unit is destroyed roll for break test
         if (outcome == null) {
             combatScoreAndBreakTest();
         }
     }
 
-    public void applyDevastatingCharge(OffensiveProfile profile) {
+    private void applyDevastatingCharge(OffensiveProfile profile, int direction) {
         Unit unit = identifyUnit(profile);
+        DevastatingCharge values = profile.getDevastatingCharge();
+        profile.setAtt(profile.getAtt() + (values.getAtt() * direction));
+        profile.setOff(profile.getOff() + (values.getOff() * direction));
+        profile.setStr(profile.getStr() + (values.getStr() * direction));
+        profile.setAp(profile.getAp() + (values.getAp() * direction));
+        profile.setAgi(profile.getAgi() + (values.getAgi() * direction));
+        unit.setDef(unit.getDef() + (values.getDef() * direction));
+        unit.setRes(unit.getRes() + (values.getRes() * direction));
+        unit.setArm(unit.getArm() + (values.getArm() * direction));
+        unit.setFortitudeSave(unit.getFortitudeSave() + (values.getFortitudeSave() * direction));
+        unit.setAegisSave(unit.getAegisSave() + (values.getAegisSave() * direction));
+        unit.setLeadership(unit.getLeadership() + (values.getLeadership() * direction));
+        unit.setSupportingRows(unit.getSupportingRows() + (values.getSupportingRows() * direction));
+        if (direction == 1) {
+            for (SpecialRule rule : values.getSpecialRulesOffensiveProfile()) {
+                profile.getSpecialRules().add(rule);
+            }
+            for (SpecialRule rule : values.getSpecialRulesArmybookEntry()) {
+                unit.getSpecialRules().add(rule);
+            }
+        } else {
+            for (SpecialRule rule : values.getSpecialRulesOffensiveProfile()) {
+                profile.getSpecialRules().remove(rule);
+            }
+            for (SpecialRule rule : values.getSpecialRulesArmybookEntry()) {
+                unit.getSpecialRules().remove(rule);
+            }
+        }
     }
 
-    public int getUnitWidth(Unit unit) {
+    private int getUnitWidth(Unit unit) {
         int width = unit.getBaseWidth() * unit.getRowModelsCurrent();
         if (unit.getSpecialRules().contains(SpecialRule.SKIRMISHER)) {
             width += 12.5 * (unit.getRowModelsCurrent() - 1);
@@ -204,7 +192,7 @@ public class Combat {
         return width;
     }
 
-    public int getModelsInContact(Unit unit) {
+    private int getModelsInContact(Unit unit) {
         int thisUnitWidth = getUnitWidth(unit);
         int otherUnitWidth = getUnitWidth(identifyOpposingUnit(unit));
         int contactWidth = min(thisUnitWidth, otherUnitWidth);
@@ -243,7 +231,7 @@ public class Combat {
         return allProfiles;
     }
 
-    public List<OffensiveProfile> sortByAgi() {
+    private List<OffensiveProfile> sortByAgi() {
         List<OffensiveProfile> profiles = listAllProfiles();
         //add agi bonus for charge if applicable
         if (round == 1) {
@@ -262,7 +250,7 @@ public class Combat {
         return profiles;
     }
 
-    public Unit identifyUnit(OffensiveProfile profile) {
+    private Unit identifyUnit(OffensiveProfile profile) {
         if (profile.getUnitId().equals(unit1.getUnitId())) {
             return unit1;
         } else if (profile.getUnitId().equals(unit2.getUnitId())) {
@@ -272,7 +260,7 @@ public class Combat {
         }
     }
 
-    public Unit identifyOpposingUnit(Unit unit) {
+    private Unit identifyOpposingUnit(Unit unit) {
         if (unit.equals(unit1)) {
             return unit2;
         } else if (unit.equals(unit2)) {
@@ -282,7 +270,7 @@ public class Combat {
         }
     }
 
-    public int getSupportingAttacks(OffensiveProfile attacker) {
+    private int getSupportingAttacks(OffensiveProfile attacker) {
         int supportingRows = identifyUnit(attacker).getSupportingRows();
         Unit attackingUnit = identifyUnit(attacker);
         //speak gives fight in extra rank
@@ -304,7 +292,7 @@ public class Combat {
         }
     }
 
-    public int getAllAttacks(OffensiveProfile attacker) {
+    private int getAllAttacks(OffensiveProfile attacker) {
         Unit attackingUnit = identifyUnit(attacker);
         int attacksPerProfile = attacker.getAtt();
         //in case of a giant with Rage
@@ -317,11 +305,11 @@ public class Combat {
         return (frontAttacks + supportingAttacks) * attacker.getCountInUnit();
     }
 
-    public int getHitDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getHitDifficulty(OffensiveProfile attacker, Unit defender) {
         combatDescription.add("Rolling for hit");
         int off = attacker.getOff();
         int def = defender.getDef();
-        if (defender.getSpecialRules().contains(SpecialRule.PARRY) || (defender.getActualWeapons().contains(WeaponType.HW_SHIELD) && defender.isOnFoot())) {
+        if (defender.getSpecialRules().contains(SpecialRule.PARRY) || (defender.usingShield()) && defender.isOnFoot()) {
             def = max(attacker.getOff(), def + 1);
         }
 
@@ -340,14 +328,18 @@ public class Combat {
         }
         //special rules
         difficulty = difficulty + identifyUnit(attacker).getFailedFear() - defender.getFailedFear();
-        if (defender.getSpecialRules().contains(SpecialRule.DISTRACTING)) {  difficulty += 1;  }
-        if (attacker.getSpecialRules().contains(SpecialRule.LIGHTNING_REFLEXES) && attacker.getActualWeapon() != WeaponType.GREAT) { difficulty -= 1; }
+        if (defender.getSpecialRules().contains(SpecialRule.DISTRACTING)) {
+            difficulty += 1;
+        }
+        if (attacker.getSpecialRules().contains(SpecialRule.LIGHTNING_REFLEXES) && attacker.getActualWeapon() != WeaponType.GREAT) {
+            difficulty -= 1;
+        }
         //return difficulty
         combatDescription.add("Needs to roll at least " + difficulty);
         return difficulty;
     }
 
-    public int getWoundDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getWoundDifficulty(OffensiveProfile attacker, Unit defender) {
         combatDescription.add("Rolling for wound");
         int diff = attacker.getStr() - defender.getRes();
         int difficulty;
@@ -366,14 +358,14 @@ public class Combat {
         return difficulty;
     }
 
-    public int getArmorDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getArmorDifficulty(OffensiveProfile attacker, Unit defender) {
         combatDescription.add("Rolling for armor");
         int difficulty = max((defender.getArmorSave() + attacker.getAp()), 2);
         combatDescription.add("Needs to roll at least " + difficulty);
         return difficulty;
     }
 
-    public int getSpecialSavesDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getSpecialSavesDifficulty(OffensiveProfile attacker, Unit defender) {
         combatDescription.add("Rolling for special saves");
         //load original values
         int aegis = defender.getAegisSave();
@@ -399,7 +391,7 @@ public class Combat {
         }
     }
 
-    public int multiplyWounds(int wounds, OffensiveProfile attacker, Unit defender) {
+    private int multiplyWounds(int wounds, OffensiveProfile attacker, Unit defender) {
         int multipliedWounds = wounds;
         if (attacker.getMultipleWounds() != Dice.NONE) {
             multipliedWounds = 0;
@@ -414,7 +406,7 @@ public class Combat {
         return multipliedWounds;
     }
 
-    public int rollSuccess(int times, int difficulty, boolean reroll, boolean rerollNegative) {
+    private int rollSuccess(int times, int difficulty, boolean reroll, boolean rerollNegative) {
         int result = 0;
         rolled6 = 0;
         if (difficulty < 7) {
@@ -424,17 +416,27 @@ public class Combat {
                 if (roll >= difficulty) {
                     if (rerollNegative) {
                         int roll2 = d6();
-                        if (roll2 == 6) { rolled6 += 1; }
-                        if (roll2 >= difficulty) { result += 1; }
+                        if (roll2 == 6) {
+                            rolled6 += 1;
+                        }
+                        if (roll2 >= difficulty) {
+                            result += 1;
+                        }
                     } else {
                         //check if rolled 6
-                        if (roll == 6) {  rolled6 += 1;  }
+                        if (roll == 6) {
+                            rolled6 += 1;
+                        }
                         result += 1;
                     }
                 } else if (reroll) { //if unsuccessful and reroll is applicable
                     int roll2 = d6();
-                    if (roll2 == 6) { rolled6 += 1; }
-                    if (roll2 >= difficulty) { result += 1; }
+                    if (roll2 == 6) {
+                        rolled6 += 1;
+                    }
+                    if (roll2 >= difficulty) {
+                        result += 1;
+                    }
                 }
             }
         }
@@ -442,7 +444,7 @@ public class Combat {
         return result;
     }
 
-    public void killedModelsOP(OffensiveProfile attacker, Unit defender) {
+    private void killedModelsOP(OffensiveProfile attacker, Unit defender) {
         int autowound = 0;
         int noArmor = 0;
         boolean rerollSpecialSavesNeg = false;
@@ -504,13 +506,13 @@ public class Combat {
         saveInflictedWounds(finalWounds, defender);
     }
 
-    public void saveInflictedWounds(int wounds, Unit defender) {
+    private void saveInflictedWounds(int wounds, Unit defender) {
         defender.setWoundsOnAgiStep(defender.getWoundsOnAgiStep() + wounds);
         defender.setWoundsInRound(defender.getWoundsInRound() + wounds);
         combatDescription.add("Inflicted " + wounds + " wounds");
     }
 
-    public void removeCasualties(Unit defender) {
+    private void removeCasualties(Unit defender) {
         int lostHitPoints = defender.getWoundsOnAgiStep() + defender.getLostHitPoints();
         int killedModels = lostHitPoints / defender.getHp();
         defender.setLostHitPoints(lostHitPoints % defender.getHp());
@@ -530,7 +532,7 @@ public class Combat {
         }
     }
 
-    public void killedNoSpecialRules(OffensiveProfile attacker, Unit defender, int attacks) {
+    private void killedNoSpecialRules(OffensiveProfile attacker, Unit defender, int attacks) {
         Unit attackingUnit = identifyUnit(attacker);
         //hit
         int hits = rollSuccess(attacks, getHitDifficulty(attacker, defender), false, false);
@@ -548,7 +550,7 @@ public class Combat {
         saveInflictedWounds(finalWounds, defender);
     }
 
-    public boolean nextProfileSimultaneous(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
+    private boolean nextProfileSimultaneous(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
         OffensiveProfile nextProfile = findNextProfile(allProfiles, currentProfile);
         if (nextProfile != null) {
             if (currentProfile.getAgiCurrent() == nextProfile.getAgiCurrent()) {
@@ -562,7 +564,7 @@ public class Combat {
         }
     }
 
-    public boolean nextProfileStomp(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
+    private boolean nextProfileStomp(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
         //if there are any more profiles to go through, return false
         if (allProfiles.indexOf(currentProfile) != allProfiles.size() - 1) {
             return false;
@@ -575,7 +577,7 @@ public class Combat {
         return false;
     }
 
-    public OffensiveProfile findNextProfile(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
+    private OffensiveProfile findNextProfile(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
         int index1 = allProfiles.indexOf(currentProfile);
         int index2 = index1 + 1;
         if (index2 < 0 || index2 >= allProfiles.size()) {
@@ -585,7 +587,7 @@ public class Combat {
         }
     }
 
-    public void combatScoreAndBreakTest() {
+    private void combatScoreAndBreakTest() {
         int unit1Score = getCombatScore(unit1);
         combatDescription.add("Combat result for " + unit1.getName() + " is " + unit1Score);
         int unit2Score = getCombatScore(unit2);
@@ -630,7 +632,7 @@ public class Combat {
                 } else {
                     breakTestPassed = breakTestPassed(loser, combatScoreDiff);
                 }
-                if (breakTestPassed == false && loser.equals(unit1)) {
+                if (!breakTestPassed && loser.equals(unit1)) {
                     if (loser.getSpecialRules().contains(SpecialRule.WARMACHINE)) {
                         System.out.println(loser.getName() + " destroyed");
                         outcome = CombatOutcome.UNIT1_DESTROYED;
@@ -639,7 +641,7 @@ public class Combat {
                         System.out.println(loser.getName() + " fled");
                         outcome = CombatOutcome.UNIT1_FLED;
                     }
-                } else if (breakTestPassed == false && loser.equals(unit2)) {
+                } else if (!breakTestPassed && loser.equals(unit2)) {
                     if (loser.getSpecialRules().contains(SpecialRule.WARMACHINE)) {
                         System.out.println(loser.getName() + " destroyed");
                         outcome = CombatOutcome.UNIT2_DESTROYED;
@@ -653,7 +655,7 @@ public class Combat {
         }
     }
 
-    public int getCombatScore(Unit unit) {
+    private int getCombatScore(Unit unit) {
         //get rank bonus only if not in line formation
         int rankBonus = 0;
         if (unit.getRowModelsCurrent() < 8 && !unit.getSpecialRules().contains(SpecialRule.LIGHT_TROOPS) && !unit.getSpecialRules().contains(SpecialRule.SOBER)) {
@@ -668,7 +670,7 @@ public class Combat {
         return combatScore;
     }
 
-    public Unit determineLoser(int unit1Score, int unit2Score) {
+    private Unit determineLoser(int unit1Score, int unit2Score) {
         if (unit1Score > unit2Score) {
             combatDescription.add(unit2.getName() + " lost");
             return unit2;
@@ -681,7 +683,7 @@ public class Combat {
         }
     }
 
-    public boolean breakTestPassed(Unit unit, int combatScoreDiff) {
+    private boolean breakTestPassed(Unit unit, int combatScoreDiff) {
         //get roll difficulty
         int modifier = combatScoreDiff;
         if (unit.getFullRanks() > identifyOpposingUnit(unit).getFullRanks() || unit.getSpecialRules().contains(SpecialRule.STUBBORN)) {
@@ -707,14 +709,170 @@ public class Combat {
         }
     }
 
-    public int d6() {
+    //special rules
+    private void specialRulesGlobal(Unit unit) {
+        scoring(unit);
+        auraOfMadness(unit);
+        fear(unit);
+        wallOfIron(unit);
+        supernalMagicalAttacks(unit);
+        cragWarden(unit);
+        brothersOfVengeance(unit);
+
+        for (OffensiveProfile profile : unit.getOffensiveProfiles()) {
+            drunk(profile); //sets devastating charge
+            sturdy(profile); //sets devastating charge
+            flamingAttacks(profile);
+            weaponEffects(profile);
+        }
+    }
+
+    private void specialRulesRound(Unit unit) {
+        rollFear(unit);
+        shieldWall(unit);
+
+        for (OffensiveProfile profile : unit.getOffensiveProfiles()) {
+            //rules giving reroll for hit for this round: only when no reroll for whole combat
+            if (!profile.isRerollHitBasic()) {
+                profile.setRerollHit(false);
+                if (profile.getSpecialRules().contains(SpecialRule.HATRED) && round == 1) {
+                    profile.setRerollHit(true);
+                }
+                if (profile.getSpecialRules().contains(SpecialRule.PRIMAL_INSTINCT) && !profile.isRerollHit()) {
+                    if (breakTestPassed(identifyUnit(profile), 0)) {
+                        profile.setRerollHit(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void weaponEffects(OffensiveProfile profile) {
+        greatWeapon(profile);
+        giantClub(profile);
+        uprootedTree(profile);
+    }
+
+    private void scoring(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.SCORING)) {
+            unit.setScoring(1);
+        }
+        if (unit.getSpecialRules().contains(SpecialRule.SOBER) || unit.getSpecialRules().contains(SpecialRule.CRAG_WARDEN)) {
+            unit.setScoring(0);
+        }
+    }
+
+    private void rollFear(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEARLESS)) {
+            combatDescription.add("Need to roll discipline for " + identifyOpposingUnit(unit).getName() + " (fear)");
+            if (breakTestPassed(identifyOpposingUnit(unit), 0)) {
+                identifyOpposingUnit(unit).setFailedFear(0);
+            } else {
+                identifyOpposingUnit(unit).setFailedFear(1);
+            }
+        }
+    }
+
+    private void fear(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEAR) && !identifyOpposingUnit(unit).getSpecialRules().contains(SpecialRule.FEARLESS)) {
+            identifyOpposingUnit(unit).setLeadership(unit.getLeadership() - 1);
+        }
+    }
+
+    private void flamingAttacks(OffensiveProfile profile) {
+        if (profile.getSpecialRules().contains(SpecialRule.FLAMING_ATTACKS) && identifyOpposingUnit(identifyUnit(profile)).getSpecialRules().contains(SpecialRule.FLAMEABLE)) {
+            profile.setRerollWound(true);
+        }
+    }
+
+    private void auraOfMadness(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.AURA_OF_MADNESS)) {
+            identifyOpposingUnit(unit).setLeadership(unit.getLeadership() - 1);
+        }
+    }
+
+    private void drunk(OffensiveProfile profile) {
+        if (identifyUnit(profile).getSpecialRules().contains(SpecialRule.DRUNK)) {
+            profile.getDevastatingCharge().setStr(profile.getDevastatingCharge().getStr() + 1);
+            profile.getDevastatingCharge().setAp(profile.getDevastatingCharge().getAp() + 1);
+            identifyUnit(profile).getSpecialRules().add(SpecialRule.FEARLESS);
+        }
+    }
+
+    private void supernalMagicalAttacks(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.SUPERNAL)) {
+            unit.getSpecialRules().add(SpecialRule.MAGICAL_ATTACKS);
+        }
+    }
+
+    private void shieldWall(Unit unit) {
+        if (!(unit.getAegisSave() != 0 && unit.getAegisSave() < 6) && unit.getSpecialRules().contains(SpecialRule.SHIELD_WALL) && unit.usingShield()) {
+            unit.setAegisSave(6);
+            if (identifyOpposingUnit(unit).getCharge() == 1 && round == 1) {
+                unit.setAegisSave(5);
+            }
+        }
+    }
+
+    private void wallOfIron(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.WALL_OF_IRON) && (unit.getAegisSave() > 5 || unit.getAegisSave() == 0)) {
+            unit.setAegisSave(5);
+        }
+    }
+
+    private void sturdy(OffensiveProfile profile) {
+        if (profile.getSpecialRules().contains(SpecialRule.STURDY)) {
+            profile.getDevastatingCharge().setStr(profile.getDevastatingCharge().getStr() + 1);
+            profile.getDevastatingCharge().setAp(profile.getDevastatingCharge().getAp() + 1);
+        }
+    }
+
+    private void cragWarden(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.CRAG_WARDEN)) {
+            unit.getSpecialRules().add(SpecialRule.SKIRMISHER);
+            unit.getSpecialRules().add(SpecialRule.LIGHT_TROOPS);
+            unit.getSpecialRules().add(SpecialRule.HARD_TARGET);
+        }
+    }
+
+    private void brothersOfVengeance(Unit unit) {
+        if (unit.getSpecialRules().contains(SpecialRule.BROTHERS_OF_VENGEANCE)) {
+            unit.getSpecialRules().add(SpecialRule.SKIRMISHER);
+            unit.getSpecialRules().add(SpecialRule.LIGHT_TROOPS);
+            unit.getSpecialRules().add(SpecialRule.HARD_TARGET);
+        }
+    }
+
+    //weapons
+    private void greatWeapon(OffensiveProfile profile) {
+        if (profile.getActualWeapon() == WeaponType.GREAT && !profile.getSpecialRules().contains(SpecialRule.LIGHTNING_REFLEXES)) {
+            profile.setAgi(0);
+        }
+    }
+
+    private void giantClub(OffensiveProfile profile) {
+        if (profile.getActualWeapon() == WeaponType.GIANT_CLUB) {
+            profile.setStr(profile.getStr() + 1);
+            profile.setAp(profile.getAp() + 1);
+        }
+    }
+
+    private void uprootedTree(OffensiveProfile profile) {
+        if (profile.getActualWeapon() == WeaponType.UPROOTED_TREE) {
+            profile.setStr(5);
+            profile.setAp(0);
+        }
+    }
+
+    //dice rolling
+    private int d6() {
         Random randomGenerator = new Random();
         int d6 = randomGenerator.nextInt(6) + 1;
         combatDescription.add("rolled " + d6);
         return d6;
     }
 
-    public int d3() {
+    private int d3() {
         Random randomGenerator = new Random();
         int d3 = randomGenerator.nextInt(3) + 1;
         combatDescription.add("rolled " + d3);

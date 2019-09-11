@@ -101,23 +101,11 @@ public class Unit extends ArmybookEntry {
             //add to a newly made offensiveProfiles list with specific profiles
             this.offensiveProfiles.add(offensiveProfile);
         }
-        //special rules
-        if (armybookEntry.getSpecialRules().contains(SpecialRule.SCORING) && !armybookEntry.getSpecialRules().contains(SpecialRule.SOBER)) {
-            this.scoring = 1;
-        } else {
-            this.scoring = 0;
-        }
-        if (armybookEntry.getSpecialRules().contains(SpecialRule.SUPERNAL)) {
-            this.specialRules.add(SpecialRule.MAGICAL_ATTACKS);
-        }
     }
 
     public boolean usingShield() {
         for (OffensiveProfile profile : offensiveProfiles) {
-            if (profile.getActualWeapon() == WeaponType.HW_SHIELD
-                    || profile.getActualWeapon() == WeaponType.LANCE_SHIELD
-                    || profile.getActualWeapon() == WeaponType.LIGHT_LANCE_SHIELD
-                    || profile.getActualWeapon() == WeaponType.SPEAR_SHIELD) {
+            if (profile.getActualWeapon() == WeaponType.HW_SHIELD) {
                 return true;
             }
         }
@@ -135,7 +123,6 @@ public class Unit extends ArmybookEntry {
             profile.setRerollHit(false);
             profile.setRerollWound(false);
         }
-        System.out.println("Unit reset");
     }
 
     public int getModelCount() {

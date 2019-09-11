@@ -412,6 +412,16 @@ public enum SpecialRule {
             return "Wall of iron";
         }
     },
+    CRAG_WARDEN {
+        public String toString() {
+            return "Crag warden";
+        }
+    },
+    BROTHERS_OF_VENGEANCE {
+        public String toString() {
+            return "Brothers of vengeance";
+        }
+    },
     MAGICAL_ATTACKS {
         public String toString() {
             return "Magical attacks";
