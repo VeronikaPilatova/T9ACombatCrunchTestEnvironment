@@ -31,7 +31,9 @@ public class HlavniController {
             SpecialRule.WIZARD_CONCLAVE.toString(),
             SpecialRule.PARRY.toString(),
             SpecialRule.SHIELD_WALL.toString(),
-            SpecialRule.WALL_OF_IRON.toString());
+            SpecialRule.WALL_OF_IRON.toString(),
+            SpecialRule.BROTHERS_OF_VENGEANCE.toString(),
+            SpecialRule.CRAG_WARDEN.toString());
 
     private List<String> specialRulesOffensiveProfile = Arrays.asList(
             SpecialRule.TOXIC_ATTACKS.toString(),
@@ -45,7 +47,8 @@ public class HlavniController {
             SpecialRule.STRENGTH_FROM_FLESH.toString(),
             SpecialRule.FLAMING_ATTACKS.toString(),
             SpecialRule.LETHAL_STRIKE.toString(),
-            SpecialRule.STURDY.toString());
+            SpecialRule.STURDY.toString(),
+            SpecialRule.COMIN_WITH_ME.toString());
 
     @RequestMapping("/")
     public ModelAndView showInputForm() {

@@ -15,6 +15,7 @@ public enum WeaponType {
     UPROOTED_TREE {public String toString() {return "Uprooted tree";}},
     GIANT_CLUB {public String toString() {return "Giant club";}},
     TALON_SCYTHES {public String toString() {return "Talon scythes";}},
+    WHIRLING_CHAINS {public String toString() {return "Whirling chains of doom";}},
     EXECUTIONER_BLADE {public String toString() {return "Executioner's blade";}},
     NONE {public String toString() {return "None";}};
 

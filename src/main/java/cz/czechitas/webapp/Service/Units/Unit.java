@@ -26,6 +26,7 @@ public class Unit extends ArmybookEntry {
     private int lostHitPoints;
     private int originalLostHitPoints;
     private int woundsOnAgiStep;
+    private int woundsOnAgiStepImpact;
     private int woundsInRound;
     private int scoring;
     private int failedFear;
@@ -298,6 +299,10 @@ public class Unit extends ArmybookEntry {
     public int getOriginalLostHitPoints() { return originalLostHitPoints; }
 
     public void setOriginalLostHitPoints(int originalLostHitPoints) { this.originalLostHitPoints = originalLostHitPoints; }
+
+    public int getWoundsOnAgiStepImpact() { return woundsOnAgiStepImpact; }
+
+    public void setWoundsOnAgiStepImpact(int newValue) { woundsOnAgiStepImpact = newValue; }
 
     public int getHp() {
         if (modelCount == 1 && specialRules.contains(SpecialRule.WIZARD_CONCLAVE) && champion == 1) {

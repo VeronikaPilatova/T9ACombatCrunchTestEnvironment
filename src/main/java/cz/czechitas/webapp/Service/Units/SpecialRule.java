@@ -422,6 +422,11 @@ public enum SpecialRule {
             return "Brothers of vengeance";
         }
     },
+    COMIN_WITH_ME {
+        public String toString() {
+            return "Yer comin' with me!";
+        }
+    },
     MAGICAL_ATTACKS {
         public String toString() {
             return "Magical attacks";

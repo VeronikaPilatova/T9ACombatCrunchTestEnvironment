@@ -112,7 +112,9 @@ public class Combat {
                     killedNoSpecialRules(profile, defender, profile.getImpactHits().toNumber());
                 }
             }
-            //remove killed models unless the first profile to attack is also on initiative step 10
+            unit1.setWoundsOnAgiStepImpact(unit1.getWoundsOnAgiStep());
+            unit2.setWoundsOnAgiStepImpact(unit2.getWoundsOnAgiStep());
+            //remove killed models if applicable, unless the first profile to attack is also on initiative step 10
             if (allProfiles.get(0).getAgiCurrent() != 10) {
                 if (unit1.getWoundsOnAgiStep() > 0) { removeCasualties(unit1); }
                 if (unit2.getWoundsOnAgiStep() > 0) { removeCasualties(unit2); }
@@ -121,7 +123,7 @@ public class Combat {
         //standard combat
         for (OffensiveProfile profile : allProfiles) {
             combatDescription.add(profile.getName() + " attacking");
-            killedModelsOP(profile, identifyOpposingUnit(identifyUnit(profile)));
+            killedModelsOP(profile, identifyOpposingUnit(identifyUnit(profile)), AttackType.STANDARD);
             //grinding attacks
             if (profile.getGrindingHits() != Dice.NONE && !(round == 1 && identifyUnit(profile).getCharge() == 1 && profile.getImpactHits() != Dice.NONE)) {
                 Unit defender = identifyOpposingUnit(identifyUnit(profile));
@@ -130,6 +132,8 @@ public class Combat {
             }
             //remove killed models if this initiative step is finished
             if (!nextProfileSimultaneous(allProfiles, profile) && !(nextProfileStomp(allProfiles, profile) && profile.getAgiCurrent() == 0)) {
+                //if one unit has Comin' with me, resolve their attack before they are removed
+                cominWithMe(profile);
                 removeCasualties(unit1);
                 removeCasualties(unit2);
             }
@@ -144,8 +148,19 @@ public class Combat {
                 }
             }
         }
-        if (unit1.getWoundsOnAgiStep() > 0) { removeCasualties(unit1); }
-        if (unit2.getWoundsOnAgiStep() > 0) { removeCasualties(unit2); }
+        //remove killed models if applicable
+        if (unit1.getWoundsOnAgiStep() > 0) {
+            for (OffensiveProfile profile : unit1.getOffensiveProfiles()) {
+                cominWithMe(profile);
+            }
+            removeCasualties(unit1);
+        }
+        if (unit2.getWoundsOnAgiStep() > 0) {
+            for (OffensiveProfile profile : unit2.getOffensiveProfiles()) {
+                cominWithMe(profile);
+            }
+            removeCasualties(unit2);
+        }
         //if no unit is destroyed roll for break test
         if (outcome == null) {
             combatScoreAndBreakTest();
@@ -305,14 +320,22 @@ public class Combat {
         return (frontAttacks + supportingAttacks) * attacker.getCountInUnit();
     }
 
-    private int getHitDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getHitDifficulty(OffensiveProfile attacker, Unit defender, AttackType type) {
         combatDescription.add("Rolling for hit");
-        int off = attacker.getOff();
-        int def = defender.getDef();
+        int off;
+        int def;
+        //if attack type is special (impact, stomp, etc.), use unmodified stats
+        if (type == AttackType.NO_MODIFIERS) {
+            off = attacker.getOriginalOff();
+            def = defender.getArmybookEntry().getDef();
+        } else {
+            off = attacker.getOff();
+            def = defender.getDef();
+        }
         if (defender.getSpecialRules().contains(SpecialRule.PARRY) || (defender.usingShield()) && defender.isOnFoot()) {
             def = max(attacker.getOff(), def + 1);
         }
-
+        //difficulty table
         int diff = off - def;
         int difficulty;
         if (diff > 3) {
@@ -339,9 +362,19 @@ public class Combat {
         return difficulty;
     }
 
-    private int getWoundDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getWoundDifficulty(OffensiveProfile attacker, Unit defender, AttackType type) {
         combatDescription.add("Rolling for wound");
-        int diff = attacker.getStr() - defender.getRes();
+        int diff;
+        //if attack type is special (impact, stomp, etc.), use unmodified stats
+        if (type == AttackType.NO_MODIFIERS) {
+            diff = attacker.getOriginalStr() - defender.getArmybookEntry().getRes();
+        } else if (type == AttackType.COMIN_WITH_ME) {
+            //for Comin' with me special rule - Str is always 5
+            diff = 5 - defender.getRes();
+        } else {
+            diff = attacker.getStr() - defender.getRes();
+        }
+        //difficulty table
         int difficulty;
         if (diff > 1) {
             difficulty = 2;
@@ -358,18 +391,34 @@ public class Combat {
         return difficulty;
     }
 
-    private int getArmorDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getArmorDifficulty(OffensiveProfile attacker, Unit defender, AttackType type) {
         combatDescription.add("Rolling for armor");
-        int difficulty = max((defender.getArmorSave() + attacker.getAp()), 2);
+        int difficulty;
+        //if attack type is special (impact, stomp, etc.), use unmodified stats
+        if (type == AttackType.NO_MODIFIERS) {
+            difficulty = max((defender.getArmorSave() + attacker.getOriginalAp()), 2);
+        } else if (type == AttackType.COMIN_WITH_ME) {
+            //for Comin' with me special rule - Ap is always 2
+            difficulty = max((defender.getArmorSave() + 2), 2);
+        } else {
+            difficulty = max((defender.getArmorSave() + attacker.getAp()), 2);
+        }
         combatDescription.add("Needs to roll at least " + difficulty);
         return difficulty;
     }
 
-    private int getSpecialSavesDifficulty(OffensiveProfile attacker, Unit defender) {
+    private int getSpecialSavesDifficulty(OffensiveProfile attacker, Unit defender, AttackType type) {
         combatDescription.add("Rolling for special saves");
-        //load original values
-        int aegis = defender.getAegisSave();
-        int fortitude = defender.getAegisSave();
+        int aegis;
+        int fortitude;
+        //load original values, if attack type is special, use unmodified from armybook entry
+        if (type == AttackType.STANDARD) {
+            aegis = defender.getAegisSave();
+            fortitude = defender.getAegisSave();
+        } else {
+            aegis = defender.getArmybookEntry().getAegisSave();
+            fortitude = defender.getArmybookEntry().getFortitudeSave();
+        }
         //special rules
         if (attacker.getSpecialRules().contains(SpecialRule.FLAMING_ATTACKS)) {
             fortitude = 11;
@@ -444,7 +493,7 @@ public class Combat {
         return result;
     }
 
-    private void killedModelsOP(OffensiveProfile attacker, Unit defender) {
+    private void killedModelsOP(OffensiveProfile attacker, Unit defender, AttackType type) {
         int autowound = 0;
         int noArmor = 0;
         boolean rerollSpecialSavesNeg = false;
@@ -452,8 +501,13 @@ public class Combat {
         //roll the dice
         Unit attackingUnit = identifyUnit(attacker);
         int attacks = getAllAttacks(attacker);
+        //in case of Comin' with me, number of attacks = number of killed models
+        if (type == AttackType.COMIN_WITH_ME) {
+            attackingUnit = identifyUnit(attacker);
+            attacks = (attackingUnit.getWoundsOnAgiStep() + attackingUnit.getLostHitPoints() - attackingUnit.getWoundsOnAgiStepImpact()) / attackingUnit.getHp();
+        }
         //hit
-        int hits = rollSuccess(attacks, getHitDifficulty(attacker, defender), attacker.isRerollHit(), false);
+        int hits = rollSuccess(attacks, getHitDifficulty(attacker, defender, type), attacker.isRerollHit(), false);
         if (attacker.getSpecialRules().contains(SpecialRule.BATTLE_FOCUS)) {
             hits += rolled6;
         }
@@ -463,20 +517,20 @@ public class Combat {
         }
 
         //wound
-        int wounds = rollSuccess(hits, getWoundDifficulty(attacker, defender), attacker.isRerollWound(), false) + autowound;
+        int wounds = rollSuccess(hits, getWoundDifficulty(attacker, defender, type), attacker.isRerollWound(), false) + autowound;
         if (attacker.getSpecialRules().contains(SpecialRule.LETHAL_STRIKE)) {
             wounds -= rolled6;
             noArmor = rolled6;
         }
 
         //armor
-        int woundsAfterArmor = wounds - rollSuccess(wounds, getArmorDifficulty(attacker, defender), false, false) + noArmor;
+        int woundsAfterArmor = wounds - rollSuccess(wounds, getArmorDifficulty(attacker, defender, type), false, false) + noArmor;
         //special saves
         int woundsAfterSpecialSaves = woundsAfterArmor;
         if (attacker.getSpecialRules().contains(SpecialRule.DIVINE_ATTACKS) && defender.getAegisSave() > 0 && (defender.getFortitudeSave() == 0 || defender.getAegisSave() < defender.getFortitudeSave())) {
             rerollSpecialSavesNeg = true;
         }
-        if (getSpecialSavesDifficulty(attacker, defender) != 0) {
+        if (getSpecialSavesDifficulty(attacker, defender, type) != 0) {
             int woundsToSave = woundsAfterArmor;
             if (attacker.getSpecialRules().contains(SpecialRule.LETHAL_STRIKE)) {
                 if (defender.getFortitudeSave() > 0 && (defender.getAegisSave() == 0 || defender.getFortitudeSave() < defender.getAegisSave())) {
@@ -486,7 +540,7 @@ public class Combat {
                     int lethalSaved = 0;
                     //if using Aegis
                     if (defender.getAegisSave() > 0 && (defender.getFortitudeSave() == 0 || defender.getAegisSave() < defender.getFortitudeSave())) {
-                        lethalSaved = rollSuccess(noArmor, getSpecialSavesDifficulty(attacker, defender), false, rerollSpecialSavesNeg);
+                        lethalSaved = rollSuccess(noArmor, getSpecialSavesDifficulty(attacker, defender, type), false, rerollSpecialSavesNeg);
                         woundsAfterSpecialSaves -= lethalSaved;
                         woundsToSave -= noArmor;
                     }
@@ -500,7 +554,25 @@ public class Combat {
                     }
                 }
             }
-            woundsAfterSpecialSaves -= rollSuccess(woundsToSave, getSpecialSavesDifficulty(attacker, defender), false, rerollSpecialSavesNeg);
+            woundsAfterSpecialSaves -= rollSuccess(woundsToSave, getSpecialSavesDifficulty(attacker, defender, AttackType.STANDARD), false, rerollSpecialSavesNeg);
+        }
+        int finalWounds = multiplyWounds(woundsAfterSpecialSaves, attacker, defender);
+        saveInflictedWounds(finalWounds, defender);
+    }
+
+    private void killedNoSpecialRules(OffensiveProfile attacker, Unit defender, int attacks) {
+        Unit attackingUnit = identifyUnit(attacker);
+        //hit
+        int hits = rollSuccess(attacks, getHitDifficulty(attacker, defender, AttackType.NO_MODIFIERS), false, false);
+        //wound
+        int wounds = rollSuccess(hits, getWoundDifficulty(attacker, defender, AttackType.NO_MODIFIERS), false, false);
+        //armor
+        int woundsAfterArmor = wounds - rollSuccess(wounds, getArmorDifficulty(attacker, defender, AttackType.NO_MODIFIERS), false, false);
+        //special saves
+        int woundsAfterSpecialSaves = woundsAfterArmor;
+        if (getSpecialSavesDifficulty(attacker, defender, AttackType.NO_MODIFIERS) != 0) {
+            int woundsToSave = woundsAfterArmor;
+            woundsAfterSpecialSaves -= rollSuccess(woundsToSave, getSpecialSavesDifficulty(attacker, defender, AttackType.NO_MODIFIERS), false, false);
         }
         int finalWounds = multiplyWounds(woundsAfterSpecialSaves, attacker, defender);
         saveInflictedWounds(finalWounds, defender);
@@ -532,22 +604,13 @@ public class Combat {
         }
     }
 
-    private void killedNoSpecialRules(OffensiveProfile attacker, Unit defender, int attacks) {
-        Unit attackingUnit = identifyUnit(attacker);
-        //hit
-        int hits = rollSuccess(attacks, getHitDifficulty(attacker, defender), false, false);
-        //wound
-        int wounds = rollSuccess(hits, getWoundDifficulty(attacker, defender), false, false);
-        //armor
-        int woundsAfterArmor = wounds - rollSuccess(wounds, getArmorDifficulty(attacker, defender), false, false);
-        //special saves
-        int woundsAfterSpecialSaves = woundsAfterArmor;
-        if (getSpecialSavesDifficulty(attacker, defender) != 0) {
-            int woundsToSave = woundsAfterArmor;
-            woundsAfterSpecialSaves -= rollSuccess(woundsToSave, getSpecialSavesDifficulty(attacker, defender), false, false);
+    private void cominWithMe(OffensiveProfile profile) {
+        Unit unit = identifyUnit(profile);
+        if (unit.getSpecialRules().contains(SpecialRule.COMIN_WITH_ME)) {
+            if (unit.getRowModelsCurrent() >= unit.getAllRows()) {
+                killedModelsOP(profile, identifyOpposingUnit(unit), AttackType.COMIN_WITH_ME);
+            }
         }
-        int finalWounds = multiplyWounds(woundsAfterSpecialSaves, attacker, defender);
-        saveInflictedWounds(finalWounds, defender);
     }
 
     private boolean nextProfileSimultaneous(List<OffensiveProfile> allProfiles, OffensiveProfile currentProfile) {
@@ -751,6 +814,7 @@ public class Combat {
         greatWeapon(profile);
         giantClub(profile);
         uprootedTree(profile);
+        whirlingChains(profile);
     }
 
     private void scoring(Unit unit) {
@@ -861,6 +925,14 @@ public class Combat {
         if (profile.getActualWeapon() == WeaponType.UPROOTED_TREE) {
             profile.setStr(5);
             profile.setAp(0);
+        }
+    }
+
+    private void whirlingChains(OffensiveProfile profile) {
+        if (profile.getActualWeapon() == WeaponType.WHIRLING_CHAINS) {
+            profile.setStr(profile.getStr() + 1);
+            profile.setAp(profile.getAp() + 1);
+            profile.setAgi(10);
         }
     }
 
