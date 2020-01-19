@@ -3,7 +3,7 @@ package cz.czechitas.webapp.Service.Units;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 public class Unit extends ArmybookEntry {
     private static AtomicLong idSequence = new AtomicLong(1L);
@@ -32,14 +32,38 @@ public class Unit extends ArmybookEntry {
     private int failedFear;
 
     public Unit(ArmybookEntry armybookEntry, int modelCount, int rowModels, int champion, int musician, int standard, int generalLeadership, int bsb, int charge, int standAndShoot, List<WeaponType> actualWeapons, List<WeaponTypeShooting> actualShootingWeapons, int lostHitPoints) {
-        super(armybookEntry.getName(), armybookEntry.getHp(), armybookEntry.getDef(), armybookEntry.getRes(), armybookEntry.getArm(),
-                armybookEntry.getArmorType(), armybookEntry.getFortitudeSave(), armybookEntry.getAegisSave(), armybookEntry.getAdv(), armybookEntry.getMar(),
-                armybookEntry.getLeadership(), armybookEntry.getBaseWidth(), armybookEntry.getBaseLength(), armybookEntry.getModelHeight(),
-                armybookEntry.getModelType(), armybookEntry.isOnFoot(), armybookEntry.getSupportingRows(), armybookEntry.getMinModels(),
-                armybookEntry.getMaxModels(), armybookEntry.getChampionPossible(), armybookEntry.getMusicianPossible(), armybookEntry.getStandardPossible(),
-                armybookEntry.getOffensiveProfiles(), armybookEntry.getOffensiveProfileRepeat(), armybookEntry.getChampionApplicableList(),
-                armybookEntry.getStompApplicableList(), armybookEntry.getPossibleWeaponsList(), armybookEntry.getPossibleShootingWeaponsList(), armybookEntry.getArmybook(),
-                armybookEntry.getSpecialRules(), armybookEntry.getOptionalRules());
+        this.name = armybookEntry.getName();
+        this.hp = armybookEntry.getHp();
+        this.def = armybookEntry.getDef();
+        this.res = armybookEntry.getRes();
+        this.arm = armybookEntry.getArm();
+        this.armorType = armybookEntry.getArmorType();
+        this.fortitudeSave = armybookEntry.getFortitudeSave();
+        this.aegisSave = armybookEntry.getAegisSave();
+        this.adv = armybookEntry.getAdv();
+        this.mar = armybookEntry.getMar();
+        this.leadership = armybookEntry.getLeadership();
+        this.baseWidth = armybookEntry.getBaseWidth();
+        this.baseLength = armybookEntry.getBaseLength();
+        this.modelHeight = armybookEntry.getModelHeight();
+        this.modelType = armybookEntry.getModelType();
+        this.onFoot = armybookEntry.isOnFoot();
+        this.supportingRows = armybookEntry.getSupportingRows();
+        this.minModels = armybookEntry.getMinModels();
+        this.maxModels = armybookEntry.getMaxModels();
+        this.championPossible = armybookEntry.getChampionPossible();
+        this.musicianPossible = armybookEntry.getMusicianPossible();
+        this.standardPossible = armybookEntry.getStandardPossible();
+        this.offensiveProfiles = armybookEntry.getOffensiveProfiles();
+        this.offensiveProfileRepeat = armybookEntry.getOffensiveProfileRepeat();
+        this.championApplicableList = armybookEntry.getChampionApplicableList();
+        this.stompApplicableList = armybookEntry.getStompApplicableList();
+        this.possibleWeaponsList = armybookEntry.getPossibleWeaponsList();
+        this.possibleShootingWeaponsList = armybookEntry.getPossibleShootingWeaponsList();
+        this.armybook = armybookEntry.getArmybook();
+        this.specialRules = armybookEntry.getSpecialRules();
+        this.optionalRules = armybookEntry.getOptionalRules();
+
         this.unitId = idSequence.getAndIncrement();
         this.armybookEntry = armybookEntry;
         this.modelCount = modelCount;
@@ -117,6 +141,22 @@ public class Unit extends ArmybookEntry {
             profile.setRerollWound(false);
         }
     }
+
+    public int getArmorSave() {
+        int armor = arm;
+        if (armorType == ArmorType.LIGHT) {
+            armor += 1;
+        } else if (armorType == ArmorType.HEAVY) {
+            armor += 2;
+        } else if (armorType == ArmorType.PLATE) {
+            armor += 3;
+        }
+        if (usingShield()) {
+            armor += 1;
+        }
+        return max(7 - armor, 1);
+    }
+
 
     public int getModelCount() {
         return modelCount;

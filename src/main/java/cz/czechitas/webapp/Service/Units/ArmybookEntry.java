@@ -303,18 +303,6 @@ public class ArmybookEntry {
         this.optionalRules = optionalRules;
     }
 
-    public int getArmorSave() {
-        int armor = arm;
-        if (armorType == ArmorType.LIGHT) {
-            armor += 1;
-        } else if (armorType == ArmorType.HEAVY) {
-            armor += 2;
-        } else if (armorType == ArmorType.PLATE) {
-            armor += 3;
-        }
-        return 7 - armor;
-    }
-
     public List<Integer> getStompApplicableList() {
         return stompApplicableList;
     }

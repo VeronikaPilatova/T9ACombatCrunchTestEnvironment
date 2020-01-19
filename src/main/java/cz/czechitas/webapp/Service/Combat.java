@@ -332,7 +332,7 @@ public class Combat {
             off = attacker.getOff();
             def = defender.getDef();
         }
-        if (defender.getSpecialRules().contains(SpecialRule.PARRY) || (defender.usingShield()) && defender.isOnFoot()) {
+        if (defender.getSpecialRules().contains(SpecialRule.PARRY) || (defender.usingShield() && defender.isOnFoot())) {
             def = max(attacker.getOff(), def + 1);
         }
         //difficulty table
