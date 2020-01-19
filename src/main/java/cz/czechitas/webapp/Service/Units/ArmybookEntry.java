@@ -315,6 +315,14 @@ public class ArmybookEntry {
         return 7 - armor;
     }
 
+    public List<Integer> getStompApplicableList() {
+        return stompApplicableList;
+    }
+
+    public void setStompApplicableList(List<Integer> newValue) {
+        stompApplicableList = newValue;
+    }
+
     //for test environment only
     public String getArmorTypeString() {
         return armorType.toString();

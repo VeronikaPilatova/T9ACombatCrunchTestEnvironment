@@ -32,7 +32,16 @@ public class Unit extends ArmybookEntry {
     private int failedFear;
 
     public Unit(ArmybookEntry armybookEntry, int modelCount, int rowModels, int champion, int musician, int standard, int generalLeadership, int bsb, int charge, int standAndShoot, List<WeaponType> actualWeapons, List<WeaponTypeShooting> actualShootingWeapons, int lostHitPoints) {
+        super(armybookEntry.getName(), armybookEntry.getHp(), armybookEntry.getDef(), armybookEntry.getRes(), armybookEntry.getArm(),
+                armybookEntry.getArmorType(), armybookEntry.getFortitudeSave(), armybookEntry.getAegisSave(), armybookEntry.getAdv(), armybookEntry.getMar(),
+                armybookEntry.getLeadership(), armybookEntry.getBaseWidth(), armybookEntry.getBaseLength(), armybookEntry.getModelHeight(),
+                armybookEntry.getModelType(), armybookEntry.isOnFoot(), armybookEntry.getSupportingRows(), armybookEntry.getMinModels(),
+                armybookEntry.getMaxModels(), armybookEntry.getChampionPossible(), armybookEntry.getMusicianPossible(), armybookEntry.getStandardPossible(),
+                armybookEntry.getOffensiveProfiles(), armybookEntry.getOffensiveProfileRepeat(), armybookEntry.getChampionApplicableList(),
+                armybookEntry.getStompApplicableList(), armybookEntry.getPossibleWeaponsList(), armybookEntry.getPossibleShootingWeaponsList(), armybookEntry.getArmybook(),
+                armybookEntry.getSpecialRules(), armybookEntry.getOptionalRules());
         this.unitId = idSequence.getAndIncrement();
+        this.armybookEntry = armybookEntry;
         this.modelCount = modelCount;
         this.originalModelCount = modelCount;
         this.rowModels = rowModels;
@@ -43,23 +52,6 @@ public class Unit extends ArmybookEntry {
         this.bsb = bsb;
         this.charge = charge;
         this.standAndShoot = standAndShoot;
-        this.armybookEntry = armybookEntry;
-        this.name = armybookEntry.getName();
-        this.hp = armybookEntry.getHp();
-        this.def = armybookEntry.getDef();
-        this.res = armybookEntry.getRes();
-        this.arm = armybookEntry.getArm();
-        this.fortitudeSave = armybookEntry.getFortitudeSave();
-        this.aegisSave = armybookEntry.getAegisSave();
-        this.leadership = armybookEntry.getLeadership();
-        this.baseWidth = armybookEntry.getBaseWidth();
-        this.baseLength = armybookEntry.getBaseLength();
-        this.modelHeight = armybookEntry.getModelHeight();
-        this.modelType = armybookEntry.getModelType();
-        this.supportingRows = armybookEntry.getSupportingRows();
-        this.minModels = armybookEntry.getMinModels();
-        this.maxModels = armybookEntry.getMaxModels();
-        this.specialRules = armybookEntry.getSpecialRules();
         this.actualWeapons = actualWeapons;
         this.actualShootingWeapons = actualShootingWeapons;
         this.lostHitPoints = lostHitPoints;

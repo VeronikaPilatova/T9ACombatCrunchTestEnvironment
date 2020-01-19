@@ -503,7 +503,6 @@ public class Combat {
         int attacks = getAllAttacks(attacker);
         //in case of Comin' with me, number of attacks = number of killed models
         if (type == AttackType.COMIN_WITH_ME) {
-            attackingUnit = identifyUnit(attacker);
             attacks = (attackingUnit.getWoundsOnAgiStep() + attackingUnit.getLostHitPoints() - attackingUnit.getWoundsOnAgiStepImpact()) / attackingUnit.getHp();
         }
         //hit
@@ -815,6 +814,7 @@ public class Combat {
         giantClub(profile);
         uprootedTree(profile);
         whirlingChains(profile);
+        braceOfPistols(profile);
     }
 
     private void scoring(Unit unit) {
@@ -933,6 +933,12 @@ public class Combat {
             profile.setStr(profile.getStr() + 1);
             profile.setAp(profile.getAp() + 1);
             profile.setAgi(10);
+        }
+    }
+
+    private void braceOfPistols(OffensiveProfile profile) {
+        if (profile.getActualShootingWeapon() == WeaponTypeShooting.BRACE_OF_PISTOLS) {
+            profile.setActualWeapon(WeaponType.PAIRED);
         }
     }
 
